@@ -4,7 +4,25 @@ Profiles Unity Catalog tables in a customer workspace into privacy-filtered stat
 milestones) regenerates statistically similar synthetic tables in another workspace for a Genie demo.
 The full spec is [PLAN.md](PLAN.md).
 
-**Status: milestone 1 (profile schema and pass-1 profiler).**
+**Status:** milestone 1 (profiler) and a first generator (milestone 3, simple version) are done.
+Milestones 2 (automatic privacy guard), 4 (validator) and 5 (question-driven joint statistics) are
+skipped for now: a person reviews the JSON by eye, and the fake tables are checked by eye and in Genie.
+
+## The two notebooks
+
+| Notebook | Where it runs | What it does |
+| --- | --- | --- |
+| [`01_profile_tables.ipynb`](notebooks/01_profile_tables.ipynb) | customer workspace | Reads the listed tables, writes statistics-only JSON, zips them after review |
+| [`02_generate_tables.ipynb`](notebooks/02_generate_tables.ipynb) | our workspace | Reads the zip, writes fake tables with the same names, columns, comments and keys |
+
+Both are self-contained (the package source is embedded) and are configured in one Python cell.
+Their only install is `pydantic`, from their first cell.
+
+**Known limits of the simple generator:** columns are generated independently within a table (e.g.
+a cancelled order can still have a ship date; premium customers do not spend more), except for the
+detected rules (date ordering, `a = b * c`, `a = b + c`), links between tables, and emails that match
+the generated names. Category labels below k are replaced by invented ones ("Brand A", "Brand B"...).
+Rows are generated on the driver, capped by `MAX_ROWS` per table (default 1M).
 
 ## Layout
 
@@ -21,11 +39,19 @@ synthgen/
     metadata.py           # Spark catalog / Unity Catalog information_schema metadata
     stats.py              # k-suppression and conversion helpers
     _safe.py              # the only place Spark results are collected
+  generator/
+    plan.py               # table order, sizes, which FK drives each child table's row count
+    columns.py            # samplers per column type (inverse CDF, patterns, word lists)
+    generate.py           # builds all tables in memory, parents first
+    rules.py              # date ordering, numeric identities, emails matching names
+    write.py              # CREATE TABLE with comments, insert, PK/FK constraints
+    check.py              # row counts and join rates after writing
+    vocab.py              # built-in names, streets, words (no Faker)
 config/example_dataset.yaml  # every setting spelled out with its default
 schemas/                  # JSON Schema of the profile files, for reviewers
-notebooks/01_profile_tables.ipynb  # self-contained customer notebook (generated, do not edit by hand)
+notebooks/                   # the two self-contained notebooks (generated, do not edit by hand)
 docs/customer_runbook.md     # instructions for the person running it
-scripts/build_notebook.py    # rebuilds the notebook from the package source
+scripts/build_notebook.py    # rebuilds both notebooks from the package source
 scripts/profile_fixture.py   # run pass 1 on the test fixture locally
 examples/fixture_profiles/   # sample output from the fixture
 tests/

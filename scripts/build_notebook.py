@@ -1,8 +1,10 @@
-"""Build notebooks/01_profile_tables.ipynb: one self-contained notebook for the customer workspace.
+"""Build the two self-contained notebooks:
+- notebooks/01_profile_tables.ipynb   (customer workspace: profile tables, export statistics)
+- notebooks/02_generate_tables.ipynb  (our workspace: generate synthetic tables from the statistics)
 
-The notebook embeds the synthgen package source (the "engine" cell), so nothing has to be uploaded
+Each notebook embeds the synthgen source it needs (the "engine" cell), so nothing has to be uploaded
 or installed besides pydantic from PyPI. Run this script after changing any code under synthgen/;
-a test fails if the committed notebook is out of date.
+a test fails if a committed notebook is out of date.
 
 Usage: python scripts/build_notebook.py
 """
@@ -13,10 +15,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "notebooks" / "01_profile_tables.ipynb"
+NOTEBOOK_DIR = ROOT / "notebooks"
 
 # Dependency order: each module only imports modules listed before it.
-MODULES = [
+PROFILE_MODULES = [
     ("synthgen", "synthgen/__init__.py", True),
     ("synthgen.config", "synthgen/config.py", False),
     ("synthgen.profile_schema", "synthgen/profile_schema.py", False),
@@ -30,6 +32,23 @@ MODULES = [
     ("synthgen.profiler.rules", "synthgen/profiler/rules.py", False),
     ("synthgen.profiler.relationships", "synthgen/profiler/relationships.py", False),
     ("synthgen.profiler.pass1", "synthgen/profiler/pass1.py", False),
+]
+
+GENERATE_MODULES = [
+    ("synthgen", "synthgen/__init__.py", True),
+    ("synthgen.config", "synthgen/config.py", False),
+    ("synthgen.profile_schema", "synthgen/profile_schema.py", False),
+    ("synthgen.io", "synthgen/io.py", False),
+    ("synthgen.profiler", "synthgen/profiler/__init__.py", True),
+    ("synthgen.profiler.detect", "synthgen/profiler/detect.py", False),
+    ("synthgen.generator", "synthgen/generator/__init__.py", True),
+    ("synthgen.generator.vocab", "synthgen/generator/vocab.py", False),
+    ("synthgen.generator.plan", "synthgen/generator/plan.py", False),
+    ("synthgen.generator.columns", "synthgen/generator/columns.py", False),
+    ("synthgen.generator.rules", "synthgen/generator/rules.py", False),
+    ("synthgen.generator.generate", "synthgen/generator/generate.py", False),
+    ("synthgen.generator.write", "synthgen/generator/write.py", False),
+    ("synthgen.generator.check", "synthgen/generator/check.py", False),
 ]
 
 INTRO = """\
@@ -80,8 +99,8 @@ ADVANCED_SETTINGS = {}'''
 
 ENGINE_HEADER = '''\
 # ============================== 3. ENGINE: run, do not edit ======================================
-# The profiling code (synthgen package, embedded so nothing has to be uploaded). It is plain Python:
-# feel free to read it. It only defines functions; nothing is read or written until cell 4.
+# The synthgen code, embedded so nothing has to be uploaded. It is plain Python: feel free to read it.
+# It only defines functions; nothing is read or written in this cell.
 
 import sys
 import types
@@ -149,9 +168,92 @@ archive = shutil.make_archive(str(Path(cfg.output.root) / "synthgen_profiles"), 
 print(archive)'''
 
 
-def _engine() -> str:
+GEN_INTRO = """\
+# Generate synthetic tables for a Genie demo
+
+Reads the statistics zip produced by `01_profile_tables` in the customer workspace and writes fake tables
+with the same names, columns, types and comments into a catalog and schema of your choice. The tables
+join like the originals (declared primary and foreign keys), and columns follow the original
+distributions. Nothing here touches customer data: the zip contains statistics only.
+
+**How to use it**
+1. Upload `synthgen_profiles.zip` to a volume or workspace folder.
+2. Edit **cell 2 (Configuration)**: where the zip is, and the target catalog and schema.
+3. Click **Run all**. Cell 4 prints the plan (tables, sizes, links) before anything is written.
+4. Check the summary and sample rows at the end, then point a Genie space at the new schema."""
+
+GEN_CONFIG = '''\
+# ============================== 2. CONFIGURATION: edit, then run =================================
+
+# The zip received from the customer (or the folder with the unzipped .json files).
+PROFILES = "/Volumes/main/genie_demo/files/synthgen_profiles.zip"
+
+# Where to create the fake tables. The schema is created if it does not exist.
+TARGET_CATALOG = "main"
+TARGET_SCHEMA = "genie_demo"
+
+# Size: each table gets SCALE x its real row count, at least MIN_ROWS (or its real size if smaller).
+# Child tables (orders, order lines...) follow from their parents, keeping the real proportions.
+SCALE = 0.01
+MIN_ROWS = 100
+MAX_ROWS = 1_000_000  # hard cap per table (rows are generated on the driver)
+
+SEED = 42  # same seed + same zip = same data
+
+# Declare primary and foreign keys on the new tables so Genie knows how they join (Unity Catalog).
+DECLARE_KEYS = True
+
+# Safety: tables this notebook did not create are never replaced unless you set this to True.
+REPLACE_EXISTING = False
+
+TABLE_FORMAT = "delta"'''
+
+GEN_PLAN = '''\
+# ============================== 4. PLAN: what will be generated (nothing written yet) ============
+import logging
+
+from synthgen.generator.plan import GeneratorSettings, build_plan, describe_plan, load_profiles
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s", force=True)
+for noisy in ("py4j", "pyspark"):
+    logging.getLogger(noisy).setLevel(logging.WARNING)
+
+settings = GeneratorSettings(scale=SCALE, min_rows=MIN_ROWS, max_rows=MAX_ROWS, seed=SEED)
+profiles, relationships = load_profiles(PROFILES)
+plans = build_plan(profiles, relationships, settings)
+print(describe_plan(plans, settings))'''
+
+GEN_RUN = '''\
+# ============================== 5. GENERATE and write the tables =================================
+from synthgen.generator.generate import generate
+from synthgen.generator.write import write_tables
+
+data = generate(plans, settings)
+report = write_tables(spark, plans, data, TARGET_CATALOG, TARGET_SCHEMA, settings, table_format=TABLE_FORMAT,
+                      declare_keys=DECLARE_KEYS, replace_existing=REPLACE_EXISTING)
+del data
+for table, rows in report.tables.items():
+    print(f"{table}: {rows} rows")
+for warning in report.warnings:
+    print("warning:", warning)'''
+
+GEN_CHECK = '''\
+# ============================== 6. CHECK: row counts and links between tables ====================
+from synthgen.generator.check import check_tables
+
+for line in check_tables(spark, plans, TARGET_CATALOG, TARGET_SCHEMA):
+    print(line)'''
+
+GEN_LOOK = '''\
+# ============================== 7. LOOK at the data (fake rows, safe to display) =================
+for table in report.tables:
+    print(table)
+    display(spark.table(table).limit(20))'''
+
+
+def _engine(modules: list[tuple[str, str, bool]]) -> str:
     parts = [ENGINE_HEADER]
-    for name, rel, package in MODULES:
+    for name, rel, package in modules:
         source = (ROOT / rel).read_text(encoding="utf-8")
         if "'''" in source or source.rstrip().endswith("\\"):
             raise ValueError(f"{rel} cannot be embedded in a raw triple-quoted string")
@@ -169,19 +271,11 @@ def _cell(kind: str, text: str) -> dict:
     return cell
 
 
-def build() -> dict:
-    notebook = {
-        "cells": [
-            _cell("markdown", INTRO),
-            _cell("markdown", "## 1. Install the one dependency (pydantic)"),
-            _cell("code", INSTALL),
-            _cell("code", RESTART),
-            _cell("code", CONFIG),
-            _cell("code", _engine()),
-            _cell("code", RUN),
-            _cell("markdown", REVIEW),
-            _cell("code", PACKAGE),
-        ],
+def _notebook(cells: list[dict], prefix: str) -> dict:
+    for i, cell in enumerate(cells):
+        cell["id"] = f"{prefix}-{i:02d}"
+    return {
+        "cells": cells,
         "metadata": {
             "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
             "language_info": {"name": "python"},
@@ -189,16 +283,53 @@ def build() -> dict:
         "nbformat": 4,
         "nbformat_minor": 5,
     }
-    for i, cell in enumerate(notebook["cells"]):
-        cell["id"] = f"synthgen-{i:02d}"
-    return notebook
 
 
-def render() -> str:
-    return json.dumps(build(), indent=1, ensure_ascii=False) + "\n"
+def _install_cells() -> list[dict]:
+    return [
+        _cell("markdown", "## 1. Install the one dependency (pydantic)"),
+        _cell("code", INSTALL),
+        _cell("code", RESTART),
+    ]
+
+
+def build_profile() -> dict:
+    return _notebook([
+        _cell("markdown", INTRO),
+        *_install_cells(),
+        _cell("code", CONFIG),
+        _cell("code", _engine(PROFILE_MODULES)),
+        _cell("code", RUN),
+        _cell("markdown", REVIEW),
+        _cell("code", PACKAGE),
+    ], "synthgen")
+
+
+def build_generate() -> dict:
+    return _notebook([
+        _cell("markdown", GEN_INTRO),
+        *_install_cells(),
+        _cell("code", GEN_CONFIG),
+        _cell("code", _engine(GENERATE_MODULES)),
+        _cell("code", GEN_PLAN),
+        _cell("code", GEN_RUN),
+        _cell("code", GEN_CHECK),
+        _cell("code", GEN_LOOK),
+    ], "synthgen-gen")
+
+
+NOTEBOOKS = {
+    "01_profile_tables.ipynb": build_profile,
+    "02_generate_tables.ipynb": build_generate,
+}
+
+
+def render(name: str) -> str:
+    return json.dumps(NOTEBOOKS[name](), indent=1, ensure_ascii=False) + "\n"
 
 
 if __name__ == "__main__":
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(render(), encoding="utf-8")
-    print(OUT.relative_to(ROOT))
+    NOTEBOOK_DIR.mkdir(parents=True, exist_ok=True)
+    for name in NOTEBOOKS:
+        (NOTEBOOK_DIR / name).write_text(render(name), encoding="utf-8")
+        print(f"notebooks/{name}")
