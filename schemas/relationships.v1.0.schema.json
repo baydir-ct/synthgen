@@ -1,0 +1,257 @@
+{
+  "$defs": {
+    "ChildrenPerParent": {
+      "additionalProperties": false,
+      "properties": {
+        "quantiles": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "object"
+        },
+        "zero_children_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Zero Children Share"
+        }
+      },
+      "title": "ChildrenPerParent",
+      "type": "object"
+    },
+    "ForeignKey": {
+      "additionalProperties": false,
+      "properties": {
+        "child_table": {
+          "title": "Child Table",
+          "type": "string"
+        },
+        "child_columns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Child Columns",
+          "type": "array"
+        },
+        "parent_table": {
+          "title": "Parent Table",
+          "type": "string"
+        },
+        "parent_columns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Parent Columns",
+          "type": "array"
+        },
+        "source": {
+          "enum": [
+            "declared",
+            "config",
+            "inferred"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "name_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name Score"
+        },
+        "containment": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Share of non-null child rows whose value is in the parent key.",
+          "title": "Containment"
+        },
+        "orphan_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Share of non-null child rows whose value is not in the parent key.",
+          "title": "Orphan Rate"
+        },
+        "orphan_value_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Share of distinct non-null child values that are not in the parent key.",
+          "title": "Orphan Value Share"
+        },
+        "children_per_parent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChildrenPerParent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "suppressed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppressed",
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "child_table",
+        "child_columns",
+        "parent_table",
+        "parent_columns",
+        "source"
+      ],
+      "title": "ForeignKey",
+      "type": "object"
+    },
+    "PrimaryKey": {
+      "additionalProperties": false,
+      "properties": {
+        "table": {
+          "title": "Table",
+          "type": "string"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Columns",
+          "type": "array"
+        },
+        "source": {
+          "enum": [
+            "declared",
+            "config",
+            "inferred"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "alternatives": {
+          "description": "Other unique column sets found.",
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        }
+      },
+      "required": [
+        "table",
+        "columns",
+        "source"
+      ],
+      "title": "PrimaryKey",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "profiler_version": {
+      "title": "Profiler Version",
+      "type": "string"
+    },
+    "k_threshold": {
+      "minimum": 5,
+      "title": "K Threshold",
+      "type": "integer"
+    },
+    "tables": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tables",
+      "type": "array"
+    },
+    "primary_keys": {
+      "items": {
+        "$ref": "#/$defs/PrimaryKey"
+      },
+      "title": "Primary Keys",
+      "type": "array"
+    },
+    "foreign_keys": {
+      "items": {
+        "$ref": "#/$defs/ForeignKey"
+      },
+      "title": "Foreign Keys",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "profiler_version",
+    "k_threshold",
+    "tables"
+  ],
+  "title": "Relationships",
+  "type": "object"
+}

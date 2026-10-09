@@ -1,0 +1,13 @@
+# Config used by the tests. Everything not listed here takes its default (see config/example_dataset.yaml).
+dataset: retail_fixture
+source:
+  table_patterns: ["spark_catalog.retail.*"]
+output:
+  root: "__set_by_tests__"
+privacy:
+  k: 10
+  sensitive_columns:
+    - "*.customers.contact_handle"
+  allowed_labels:
+    - "*.customers.country"
+    - "*.orders.channel"

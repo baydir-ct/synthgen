@@ -1,0 +1,332 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-09T10:55:44Z",
+  "profiler_version": "0.1.0",
+  "source_table": "spark_catalog.retail.order_lines",
+  "row_count": 21149,
+  "sample_fraction": 1.0,
+  "k_threshold": 10,
+  "comment": "One row per product line in an order",
+  "tags": {},
+  "primary_key": null,
+  "foreign_keys": [],
+  "partition_columns": [],
+  "columns": [
+    {
+      "name": "order_id",
+      "position": 0,
+      "type": "bigint",
+      "nullable": true,
+      "comment": "Order this line belongs to",
+      "tags": {},
+      "is_partition": false,
+      "role": "foreign_key",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 10017,
+      "distinct_ratio": 0.473639,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 6.0,
+          "mean": 6.0,
+          "max_clipped": 6.0
+        },
+        "patterns": [
+          {
+            "pattern": "999999",
+            "share": 1.0
+          }
+        ],
+        "other_pattern_share": 0.0,
+        "semantic_type": "identifier"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "line_no",
+      "position": 1,
+      "type": "int",
+      "nullable": true,
+      "comment": "Line number within the order",
+      "tags": {},
+      "is_partition": false,
+      "role": "key",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 5,
+      "distinct_ratio": 0.000236,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 1.0,
+          "mean": 1.0,
+          "max_clipped": 1.0
+        },
+        "patterns": [
+          {
+            "pattern": "9",
+            "share": 1.0
+          }
+        ],
+        "other_pattern_share": 0.0,
+        "semantic_type": "identifier"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "product_id",
+      "position": 2,
+      "type": "string",
+      "nullable": true,
+      "comment": "Product sold",
+      "tags": {},
+      "is_partition": false,
+      "role": "foreign_key",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 416,
+      "distinct_ratio": 0.01967,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 7.0,
+          "mean": 7.0,
+          "max_clipped": 7.0
+        },
+        "patterns": [
+          {
+            "pattern": "A-99999",
+            "share": 1.0
+          }
+        ],
+        "other_pattern_share": 0.0,
+        "semantic_type": "identifier"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "quantity",
+      "position": 3,
+      "type": "int",
+      "nullable": true,
+      "comment": "Units sold",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 6,
+      "distinct_ratio": 0.000284,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 1.0,
+        "max_clipped": 5.0,
+        "mean": 1.675635,
+        "std": 1.02154,
+        "quantiles": {
+          "0.01": 1.0,
+          "0.05": 1.0,
+          "0.1": 1.0,
+          "0.25": 1.0,
+          "0.5": 1.0,
+          "0.75": 2.0,
+          "0.9": 3.0,
+          "0.95": 4.0,
+          "0.99": 5.0
+        },
+        "zero_share": 0.0,
+        "negative_share": 0.0,
+        "is_integer": true,
+        "decimals": 0
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "unit_price",
+      "position": 4,
+      "type": "decimal(10,2)",
+      "nullable": true,
+      "comment": "Unit price at the time of sale",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 413,
+      "distinct_ratio": 0.019528,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 15.92,
+        "max_clipped": 292.34,
+        "mean": 164.073769,
+        "std": 78.917899,
+        "quantiles": {
+          "0.01": 15.92,
+          "0.05": 53.41,
+          "0.1": 62.37,
+          "0.25": 81.25,
+          "0.5": 169.14,
+          "0.75": 235.74,
+          "0.9": 269.24,
+          "0.95": 283.86,
+          "0.99": 292.34
+        },
+        "zero_share": 0.0,
+        "negative_share": 0.0,
+        "is_integer": false,
+        "decimals": 2
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "discount_pct",
+      "position": 5,
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "comment": "Line discount in percent",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 3,
+      "distinct_ratio": 0.000142,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 0.0,
+        "max_clipped": 10.0,
+        "mean": 2.984065,
+        "std": 3.991465,
+        "quantiles": {
+          "0.01": 0.0,
+          "0.05": 0.0,
+          "0.1": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 5.0,
+          "0.9": 10.0,
+          "0.95": 10.0,
+          "0.99": 10.0
+        },
+        "zero_share": 0.601494,
+        "negative_share": 0.0,
+        "is_integer": true,
+        "decimals": 0
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "line_amount",
+      "position": 6,
+      "type": "decimal(12,2)",
+      "nullable": true,
+      "comment": "quantity times unit_price",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 883,
+      "distinct_ratio": 0.041751,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 15.92,
+        "max_clipped": 1169.36,
+        "mean": 273.831107,
+        "std": 224.119312,
+        "quantiles": {
+          "0.01": 15.92,
+          "0.05": 53.41,
+          "0.1": 63.68,
+          "0.25": 125.76,
+          "0.5": 223.09,
+          "0.75": 305.55,
+          "0.9": 559.3,
+          "0.95": 755.35,
+          "0.99": 1169.36
+        },
+        "zero_share": 0.0,
+        "negative_share": 0.0,
+        "is_integer": false,
+        "decimals": 2
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "gift_message",
+      "position": 7,
+      "type": "string",
+      "nullable": true,
+      "comment": "Optional gift message written by the buyer",
+      "tags": {},
+      "is_partition": false,
+      "role": "text",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.959336,
+      "distinct_approx": 854,
+      "distinct_ratio": 0.993023,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 49.0,
+          "mean": 59.97093,
+          "max_clipped": 72.0
+        },
+        "patterns": [],
+        "other_pattern_share": 1.0,
+        "semantic_type": "free_text"
+      },
+      "date": null,
+      "boolean": null
+    }
+  ],
+  "rules": [
+    {
+      "kind": "numeric_identity",
+      "target": "line_amount",
+      "operation": "product",
+      "operands": [
+        "quantity",
+        "unit_price"
+      ],
+      "match_rate": null,
+      "sample_fraction": 0.945671,
+      "suppressed": [
+        "match_rate"
+      ]
+    }
+  ],
+  "warnings": []
+}

@@ -1,0 +1,891 @@
+{
+  "$defs": {
+    "BooleanStats": {
+      "additionalProperties": false,
+      "properties": {
+        "true_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "True Share"
+        },
+        "false_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "False Share"
+        }
+      },
+      "title": "BooleanStats",
+      "type": "object"
+    },
+    "CategoricalStats": {
+      "additionalProperties": false,
+      "properties": {
+        "top_values": {
+          "items": {
+            "$ref": "#/$defs/ValueShare"
+          },
+          "title": "Top Values",
+          "type": "array"
+        },
+        "other_share": {
+          "description": "Share of non-null values in labels not listed (rare or beyond top K).",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Other Share",
+          "type": "number"
+        },
+        "labels_not_exported": {
+          "description": "Approximate number of labels folded into 'other'.",
+          "minimum": 0,
+          "title": "Labels Not Exported",
+          "type": "integer"
+        },
+        "length": {
+          "$ref": "#/$defs/LengthStats"
+        }
+      },
+      "required": [
+        "other_share",
+        "labels_not_exported"
+      ],
+      "title": "CategoricalStats",
+      "type": "object"
+    },
+    "ColumnProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "position": {
+          "minimum": 0,
+          "title": "Position",
+          "type": "integer"
+        },
+        "type": {
+          "description": "Spark SQL type string.",
+          "title": "Type",
+          "type": "string"
+        },
+        "nullable": {
+          "title": "Nullable",
+          "type": "boolean"
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comment"
+        },
+        "tags": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "object"
+        },
+        "is_partition": {
+          "default": false,
+          "title": "Is Partition",
+          "type": "boolean"
+        },
+        "role": {
+          "enum": [
+            "key",
+            "foreign_key",
+            "categorical",
+            "numeric",
+            "date",
+            "text",
+            "boolean",
+            "other"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "sensitive": {
+          "title": "Sensitive",
+          "type": "boolean"
+        },
+        "sensitive_reasons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Sensitive Reasons",
+          "type": "array"
+        },
+        "null_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Null Rate"
+        },
+        "distinct_approx": {
+          "minimum": 0,
+          "title": "Distinct Approx",
+          "type": "integer"
+        },
+        "distinct_ratio": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "distinct_approx / non-null count.",
+          "title": "Distinct Ratio"
+        },
+        "suppressed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppressed",
+          "type": "array"
+        },
+        "numeric": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NumericStats"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "categorical": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CategoricalStats"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "text": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TextStats"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateStats"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "boolean": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BooleanStats"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "position",
+        "type",
+        "nullable",
+        "role",
+        "sensitive",
+        "distinct_approx"
+      ],
+      "title": "ColumnProfile",
+      "type": "object"
+    },
+    "DateOrderRule": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "date_order",
+          "default": "date_order",
+          "title": "Kind",
+          "type": "string"
+        },
+        "before": {
+          "title": "Before",
+          "type": "string"
+        },
+        "after": {
+          "title": "After",
+          "type": "string"
+        },
+        "match_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Share of rows with both set where before <= after.",
+          "title": "Match Rate"
+        },
+        "suppressed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppressed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "before",
+        "after",
+        "match_rate"
+      ],
+      "title": "DateOrderRule",
+      "type": "object"
+    },
+    "DateStats": {
+      "additionalProperties": false,
+      "description": "Date and timestamp statistics. Dates are ISO strings; UTC timestamps end in 'Z'.",
+      "properties": {
+        "min_clipped": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Clipped"
+        },
+        "max_clipped": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Clipped"
+        },
+        "quantiles": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Quantiles",
+          "type": "object"
+        },
+        "year_month_shares": {
+          "additionalProperties": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Year Month Shares",
+          "type": "object"
+        },
+        "other_year_month_share": {
+          "default": 0.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Other Year Month Share",
+          "type": "number"
+        },
+        "day_of_week_shares": {
+          "additionalProperties": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "title": "Day Of Week Shares",
+          "type": "object"
+        },
+        "hour_shares": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hour Shares"
+        },
+        "always_midnight": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Always Midnight"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timezone"
+        }
+      },
+      "title": "DateStats",
+      "type": "object"
+    },
+    "DeclaredForeignKey": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "columns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Columns",
+          "type": "array"
+        },
+        "parent_table": {
+          "title": "Parent Table",
+          "type": "string"
+        },
+        "parent_columns": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Parent Columns",
+          "type": "array"
+        }
+      },
+      "required": [
+        "columns",
+        "parent_table",
+        "parent_columns"
+      ],
+      "title": "DeclaredForeignKey",
+      "type": "object"
+    },
+    "LengthStats": {
+      "additionalProperties": false,
+      "description": "String length statistics. Min and max are clipped quantiles of the length.",
+      "properties": {
+        "min_clipped": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Clipped"
+        },
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mean"
+        },
+        "max_clipped": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Clipped"
+        }
+      },
+      "title": "LengthStats",
+      "type": "object"
+    },
+    "NumericIdentityRule": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "numeric_identity",
+          "default": "numeric_identity",
+          "title": "Kind",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "operation": {
+          "enum": [
+            "product",
+            "sum"
+          ],
+          "title": "Operation",
+          "type": "string"
+        },
+        "operands": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "title": "Operands",
+          "type": "array"
+        },
+        "match_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Match Rate"
+        },
+        "sample_fraction": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Sample Fraction",
+          "type": "number"
+        },
+        "suppressed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppressed",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target",
+        "operation",
+        "operands",
+        "match_rate",
+        "sample_fraction"
+      ],
+      "title": "NumericIdentityRule",
+      "type": "object"
+    },
+    "NumericStats": {
+      "additionalProperties": false,
+      "properties": {
+        "min_clipped": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Clipped"
+        },
+        "max_clipped": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Clipped"
+        },
+        "mean": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Mean of values capped at min_clipped and max_clipped.",
+          "title": "Mean"
+        },
+        "std": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Sample std of values capped at min_clipped and max_clipped.",
+          "title": "Std"
+        },
+        "quantiles": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Quantiles",
+          "type": "object"
+        },
+        "zero_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Zero Share"
+        },
+        "negative_share": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Negative Share"
+        },
+        "is_integer": {
+          "title": "Is Integer",
+          "type": "boolean"
+        },
+        "decimals": {
+          "minimum": 0,
+          "title": "Decimals",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "is_integer",
+        "decimals"
+      ],
+      "title": "NumericStats",
+      "type": "object"
+    },
+    "PatternShare": {
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "description": "Letters mapped to A, digits to 9, punctuation and spaces kept.",
+          "title": "Pattern",
+          "type": "string"
+        },
+        "share": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Share",
+          "type": "number"
+        }
+      },
+      "required": [
+        "pattern",
+        "share"
+      ],
+      "title": "PatternShare",
+      "type": "object"
+    },
+    "TextStats": {
+      "additionalProperties": false,
+      "description": "Exported for sensitive, identifier and high-cardinality columns. Never contains values.",
+      "properties": {
+        "length": {
+          "$ref": "#/$defs/LengthStats"
+        },
+        "patterns": {
+          "items": {
+            "$ref": "#/$defs/PatternShare"
+          },
+          "title": "Patterns",
+          "type": "array"
+        },
+        "other_pattern_share": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Other Pattern Share",
+          "type": "number"
+        },
+        "semantic_type": {
+          "enum": [
+            "email",
+            "phone",
+            "person_name",
+            "postcode",
+            "address",
+            "uuid",
+            "ip_address",
+            "iban",
+            "national_id",
+            "birth_date",
+            "geo",
+            "secret",
+            "special_category",
+            "identifier",
+            "free_text",
+            "short_text",
+            "unknown"
+          ],
+          "title": "Semantic Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "other_pattern_share",
+        "semantic_type"
+      ],
+      "title": "TextStats",
+      "type": "object"
+    },
+    "ValueShare": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "share": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Share",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "share"
+      ],
+      "title": "ValueShare",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "profiler_version": {
+      "title": "Profiler Version",
+      "type": "string"
+    },
+    "source_table": {
+      "title": "Source Table",
+      "type": "string"
+    },
+    "row_count": {
+      "minimum": 0,
+      "title": "Row Count",
+      "type": "integer"
+    },
+    "sample_fraction": {
+      "exclusiveMinimum": 0,
+      "maximum": 1,
+      "title": "Sample Fraction",
+      "type": "number"
+    },
+    "k_threshold": {
+      "minimum": 5,
+      "title": "K Threshold",
+      "type": "integer"
+    },
+    "comment": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Comment"
+    },
+    "tags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "object"
+    },
+    "primary_key": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Declared primary key, if any.",
+      "title": "Primary Key"
+    },
+    "foreign_keys": {
+      "description": "Declared foreign keys.",
+      "items": {
+        "$ref": "#/$defs/DeclaredForeignKey"
+      },
+      "title": "Foreign Keys",
+      "type": "array"
+    },
+    "partition_columns": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Partition Columns",
+      "type": "array"
+    },
+    "columns": {
+      "items": {
+        "$ref": "#/$defs/ColumnProfile"
+      },
+      "title": "Columns",
+      "type": "array"
+    },
+    "rules": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "date_order": "#/$defs/DateOrderRule",
+            "numeric_identity": "#/$defs/NumericIdentityRule"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/DateOrderRule"
+          },
+          {
+            "$ref": "#/$defs/NumericIdentityRule"
+          }
+        ]
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "generated_at",
+    "profiler_version",
+    "source_table",
+    "row_count",
+    "sample_fraction",
+    "k_threshold",
+    "columns"
+  ],
+  "title": "TableProfile",
+  "type": "object"
+}

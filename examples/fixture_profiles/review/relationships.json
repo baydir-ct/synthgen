@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-09T10:55:44Z",
+  "profiler_version": "0.1.0",
+  "k_threshold": 10,
+  "tables": [
+    "spark_catalog.retail.customers",
+    "spark_catalog.retail.order_lines",
+    "spark_catalog.retail.orders",
+    "spark_catalog.retail.products"
+  ],
+  "primary_keys": [
+    {
+      "table": "spark_catalog.retail.customers",
+      "columns": [
+        "customer_id"
+      ],
+      "source": "declared",
+      "alternatives": []
+    },
+    {
+      "table": "spark_catalog.retail.order_lines",
+      "columns": [
+        "order_id",
+        "line_no"
+      ],
+      "source": "inferred",
+      "alternatives": []
+    },
+    {
+      "table": "spark_catalog.retail.orders",
+      "columns": [
+        "order_id"
+      ],
+      "source": "inferred",
+      "alternatives": []
+    },
+    {
+      "table": "spark_catalog.retail.products",
+      "columns": [
+        "product_id"
+      ],
+      "source": "inferred",
+      "alternatives": [
+        [
+          "product_name"
+        ]
+      ]
+    }
+  ],
+  "foreign_keys": [
+    {
+      "child_table": "spark_catalog.retail.customers",
+      "child_columns": [
+        "referred_by_customer_id"
+      ],
+      "parent_table": "spark_catalog.retail.customers",
+      "parent_columns": [
+        "customer_id"
+      ],
+      "source": "inferred",
+      "name_score": 0.85,
+      "containment": 1.0,
+      "orphan_rate": 0.0,
+      "orphan_value_share": 0.0,
+      "children_per_parent": {
+        "quantiles": {
+          "0.01": 0.0,
+          "0.05": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 0.0,
+          "0.95": 1.0,
+          "0.99": 2.0
+        },
+        "zero_children_share": 0.8745
+      },
+      "suppressed": [],
+      "warnings": []
+    },
+    {
+      "child_table": "spark_catalog.retail.order_lines",
+      "child_columns": [
+        "order_id"
+      ],
+      "parent_table": "spark_catalog.retail.orders",
+      "parent_columns": [
+        "order_id"
+      ],
+      "source": "inferred",
+      "name_score": 1.0,
+      "containment": 1.0,
+      "orphan_rate": 0.0,
+      "orphan_value_share": 0.0,
+      "children_per_parent": {
+        "quantiles": {
+          "0.01": 1.0,
+          "0.05": 1.0,
+          "0.25": 1.0,
+          "0.5": 2.0,
+          "0.75": 3.0,
+          "0.95": 4.0,
+          "0.99": 5.0
+        },
+        "zero_children_share": 0.0
+      },
+      "suppressed": [],
+      "warnings": []
+    },
+    {
+      "child_table": "spark_catalog.retail.order_lines",
+      "child_columns": [
+        "product_id"
+      ],
+      "parent_table": "spark_catalog.retail.products",
+      "parent_columns": [
+        "product_id"
+      ],
+      "source": "inferred",
+      "name_score": 1.0,
+      "containment": 0.985768,
+      "orphan_rate": 0.014232,
+      "orphan_value_share": 0.710843,
+      "children_per_parent": {
+        "quantiles": {
+          "0.01": 42.0,
+          "0.05": 46.0,
+          "0.25": 55.0,
+          "0.5": 84.0,
+          "0.75": 145.0,
+          "0.95": 617.0,
+          "0.99": 1541.0
+        },
+        "zero_children_share": 0.0
+      },
+      "suppressed": [],
+      "warnings": []
+    },
+    {
+      "child_table": "spark_catalog.retail.orders",
+      "child_columns": [
+        "customer_id"
+      ],
+      "parent_table": "spark_catalog.retail.customers",
+      "parent_columns": [
+        "customer_id"
+      ],
+      "source": "declared",
+      "name_score": null,
+      "containment": 1.0,
+      "orphan_rate": 0.0,
+      "orphan_value_share": 0.0,
+      "children_per_parent": {
+        "quantiles": {
+          "0.01": 0.0,
+          "0.05": 0.0,
+          "0.25": 1.0,
+          "0.5": 3.0,
+          "0.75": 5.0,
+          "0.95": 14.0,
+          "0.99": 47.0
+        },
+        "zero_children_share": 0.146
+      },
+      "suppressed": [],
+      "warnings": []
+    }
+  ]
+}

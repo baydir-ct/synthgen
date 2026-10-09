@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synthgen"
+version = "0.1.0"
+description = "Profile Unity Catalog tables into privacy-filtered statistics and regenerate synthetic look-alike tables."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+# pyspark is provided by the Databricks runtime; install it locally for tests.
+spark = ["pyspark>=3.5,<4.1"]
+dev = ["pyspark>=3.5,<4.1", "pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["synthgen*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

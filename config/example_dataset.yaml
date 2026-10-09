@@ -1,0 +1,86 @@
+# synthgen dataset configuration.
+# Every threshold the toolkit uses is listed here with its default value. Dataset-specific behaviour
+# belongs in this file, never in code. Unknown keys are rejected, so typos fail loudly.
+
+dataset: retail_demo
+
+source:
+  # Fully qualified tables and/or glob patterns on catalog.schema.table.
+  tables: []
+  table_patterns: ["main.retail.*"]
+  exclude_patterns: ["main.retail.*_backup"]
+  include_views: false
+
+output:
+  # The only place the profiler writes. Profiles land in <root>/review/ for human review.
+  root: /Volumes/main/retail/synthgen
+
+# auto: use Unity Catalog information_schema (tags, declared keys) when available, else Spark catalog only.
+metadata_provider: auto
+
+privacy:
+  k: 10                               # minimum group size; any count below k is suppressed. Never below 5.
+  top_k_values: 50                    # max category labels per column
+  clip_lower: 0.01                    # exported "min" is this quantile (cannot go below 0.01)
+  clip_upper: 0.99                    # exported "max" is this quantile (cannot go above 0.99)
+  min_count_for_distribution: 50      # non-null rows needed before quantiles/mean/std/length stats are exported
+  value_pii_min_share: 0.3            # share of values that look like email/phone/IP/IBAN that marks a column PII
+  # Columns forced to sensitive (glob on catalog.schema.table.column).
+  sensitive_columns: []
+  # Columns whose category labels may leave the customer workspace (applied by the privacy guard).
+  allowed_labels: []
+  # A UC tag marks a column sensitive when its name, or "name=value", matches one of these globs.
+  pii_tag_patterns: ["pii", "pii.*", "pii_*", "class.*", "sensitive", "personal*", "gdpr*"]
+  # Column-name heuristics (regex on the lower-cased name), grouped by the semantic type they imply.
+  # Order matters: the first matching group gives the semantic type.
+  pii_name_patterns:
+    person_name:
+      - '(^|_)(first|last|full|given|family|middle|maiden|customer|contact|person|user|owner|holder)_?name($|_)'
+      - '^name$'
+      - '(^|_)(surname|forename|firstname|lastname)($|_)'
+    email: ['e_?mail']
+    phone: ['phone', 'mobile', '(^|_)(tel|telephone|fax|msisdn)($|_)']
+    ip_address: ['(^|_)ip($|_)', 'ip_?addr']
+    address: ['address', '(^|_)(street|addr|address_line)($|_)']
+    postcode: ['postcode', 'postal', '(^|_)zip($|_|code)']
+    iban: ['iban', '(^|_)(swift|bic)($|_)', '(account|card)_?(number|no|num|nr)', '(^|_)ccn($|_)']
+    national_id: ['(^|_)(ssn|dni|nif|nie|nir|cpf|nino|passport)($|_)', 'social_?security', '(tax|national|personal)_?id']
+    birth_date: ['birth', '(^|_)dob($|_)']
+    geo: ['(^|_)(lat|lon|lng|latitude|longitude|geo|geolocation)($|_)']
+    secret: ['password', '(^|_)(secret|token|api_?key)($|_)']
+    special_category: ['(^|_)(ethnic|ethnicity|religion|health|diagnosis|medical)($|_)']
+
+profiling:
+  max_categorical_distinct: 200       # strings with more distinct values are text, not categories
+  max_categorical_ratio: 0.5          # ... or with a higher distinct/non-null ratio
+  high_cardinality_ratio: 0.5         # strings above this ratio never export values
+  quantiles: [0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99]
+  percentile_accuracy: 10000          # percentile_approx accuracy (relative error ~ 1/accuracy)
+  approx_distinct_rsd: 0.02           # approx_count_distinct relative standard deviation
+  pattern_top_n: 5                    # format patterns exported per text column
+  pattern_max_length: 40              # longer values get no pattern (free text)
+  max_year_months: 600
+  max_decimals: 6
+  free_text_min_mean_length: 30.0
+  # Column names treated as identifiers: they export length and format pattern only, never values.
+  id_name_patterns: ["^id$", "_id$", "^id_", "_key$", "_uuid$", "^uuid$", "_no$", "_nr$", "^sku$"]
+  sample_fraction: 1.0                # column statistics on a sample; row counts and keys are always exact
+  sample_fractions: {}                # per-table override, e.g. {main.retail.events: 0.1}
+  sample_seed: 42
+
+relationships:
+  fk_min_containment: 0.9             # share of child rows found in the parent key to accept an inferred FK
+  name_similarity_threshold: 0.8      # name score needed before an FK candidate is tested
+  pk_prefilter_ratio: 0.9             # approx distinct ratio needed before an exact uniqueness check
+  max_pk_pair_columns: 6              # identifier columns combined pairwise when no single column is unique
+  children_quantiles: [0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99]
+  forced_pks: {}                      # e.g. {main.retail.stores: [store_code]}
+  forced_fks: []                      # e.g. [{child: main.retail.visits.store_id, parent: main.retail.stores.store_id}]
+
+rules:
+  date_order_min_rate: 0.9            # export "A on or before B" when at least this share of rows obey it
+  identity_min_rate: 0.95             # export a = b*c / a = b+c when at least this share of rows match
+  identity_sample_rows: 20000
+  identity_abs_tolerance: 0.01
+  identity_rel_tolerance: 1.0e-6
+  max_identity_columns: 10

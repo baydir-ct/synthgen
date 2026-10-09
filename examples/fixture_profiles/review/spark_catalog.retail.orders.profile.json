@@ -1,0 +1,740 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-09T10:55:44Z",
+  "profiler_version": "0.1.0",
+  "source_table": "spark_catalog.retail.orders",
+  "row_count": 10000,
+  "sample_fraction": 1.0,
+  "k_threshold": 10,
+  "comment": "One row per customer order",
+  "tags": {},
+  "primary_key": null,
+  "foreign_keys": [
+    {
+      "name": "orders_customer_fk",
+      "columns": [
+        "customer_id"
+      ],
+      "parent_table": "spark_catalog.retail.customers",
+      "parent_columns": [
+        "customer_id"
+      ]
+    }
+  ],
+  "partition_columns": [
+    "channel"
+  ],
+  "columns": [
+    {
+      "name": "order_id",
+      "position": 0,
+      "type": "bigint",
+      "nullable": true,
+      "comment": "Unique order identifier",
+      "tags": {},
+      "is_partition": false,
+      "role": "key",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 10000,
+      "distinct_ratio": 1.0,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 6.0,
+          "mean": 6.0,
+          "max_clipped": 6.0
+        },
+        "patterns": [
+          {
+            "pattern": "999999",
+            "share": 1.0
+          }
+        ],
+        "other_pattern_share": 0.0,
+        "semantic_type": "identifier"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "customer_id",
+      "position": 1,
+      "type": "int",
+      "nullable": true,
+      "comment": "Customer who placed the order",
+      "tags": {},
+      "is_partition": false,
+      "role": "foreign_key",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 1745,
+      "distinct_ratio": 0.1745,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 2.0,
+          "mean": 3.4965,
+          "max_clipped": 4.0
+        },
+        "patterns": [
+          {
+            "pattern": "9999",
+            "share": 0.5524
+          },
+          {
+            "pattern": "999",
+            "share": 0.3935
+          },
+          {
+            "pattern": "99",
+            "share": 0.0523
+          },
+          {
+            "pattern": "9",
+            "share": 0.0018
+          }
+        ],
+        "other_pattern_share": 0.0,
+        "semantic_type": "identifier"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "order_ts",
+      "position": 2,
+      "type": "timestamp",
+      "nullable": true,
+      "comment": "When the order was placed (UTC)",
+      "tags": {},
+      "is_partition": false,
+      "role": "date",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 9904,
+      "distinct_ratio": 0.9904,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": null,
+      "date": {
+        "min_clipped": "2023-01-09T13:32:39Z",
+        "max_clipped": "2025-06-19T23:32:29Z",
+        "quantiles": {
+          "0.01": "2023-01-09T13:32:39Z",
+          "0.05": "2023-02-18T16:55:52Z",
+          "0.1": "2023-04-09T17:12:08Z",
+          "0.25": "2023-09-08T18:04:06Z",
+          "0.5": "2024-03-23T13:49:02Z",
+          "0.75": "2024-11-20T20:02:36Z",
+          "0.9": "2025-03-19T14:38:02Z",
+          "0.95": "2025-05-07T19:25:37Z",
+          "0.99": "2025-06-19T23:32:29Z"
+        },
+        "year_month_shares": {
+          "2023-01": 0.0318,
+          "2023-02": 0.0283,
+          "2023-03": 0.0288,
+          "2023-04": 0.0332,
+          "2023-05": 0.031,
+          "2023-06": 0.0281,
+          "2023-07": 0.0311,
+          "2023-08": 0.0294,
+          "2023-09": 0.0307,
+          "2023-10": 0.0309,
+          "2023-11": 0.0575,
+          "2023-12": 0.0567,
+          "2024-01": 0.0306,
+          "2024-02": 0.0292,
+          "2024-03": 0.0312,
+          "2024-04": 0.0282,
+          "2024-05": 0.027,
+          "2024-06": 0.0301,
+          "2024-07": 0.0279,
+          "2024-08": 0.0308,
+          "2024-09": 0.0276,
+          "2024-10": 0.0349,
+          "2024-11": 0.0519,
+          "2024-12": 0.0542,
+          "2025-01": 0.0296,
+          "2025-02": 0.0301,
+          "2025-03": 0.031,
+          "2025-04": 0.032,
+          "2025-05": 0.0269,
+          "2025-06": 0.0293
+        },
+        "other_year_month_share": 0.0,
+        "day_of_week_shares": {
+          "Mon": 0.1353,
+          "Tue": 0.1281,
+          "Wed": 0.1253,
+          "Thu": 0.1244,
+          "Fri": 0.1319,
+          "Sat": 0.1734,
+          "Sun": 0.1816
+        },
+        "hour_shares": {
+          "00": 0.0077,
+          "01": 0.0065,
+          "02": 0.0066,
+          "03": 0.0077,
+          "04": 0.0108,
+          "05": 0.019,
+          "06": 0.0307,
+          "07": 0.044,
+          "08": 0.0473,
+          "09": 0.055,
+          "10": 0.0652,
+          "11": 0.0636,
+          "12": 0.0569,
+          "13": 0.0526,
+          "14": 0.0566,
+          "15": 0.0639,
+          "16": 0.078,
+          "17": 0.0816,
+          "18": 0.0838,
+          "19": 0.0692,
+          "20": 0.0487,
+          "21": 0.0263,
+          "22": 0.0111,
+          "23": 0.0072
+        },
+        "always_midnight": false,
+        "timezone": "UTC"
+      },
+      "boolean": null
+    },
+    {
+      "name": "ship_date",
+      "position": 3,
+      "type": "date",
+      "nullable": true,
+      "comment": "Date the order left the warehouse",
+      "tags": {},
+      "is_partition": false,
+      "role": "date",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0505,
+      "distinct_approx": 901,
+      "distinct_ratio": 0.094892,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": null,
+      "date": {
+        "min_clipped": "2023-01-11",
+        "max_clipped": "2025-06-22",
+        "quantiles": {
+          "0.01": "2023-01-11",
+          "0.05": "2023-02-20",
+          "0.1": "2023-04-11",
+          "0.25": "2023-09-10",
+          "0.5": "2024-03-27",
+          "0.75": "2024-11-23",
+          "0.9": "2025-03-22",
+          "0.95": "2025-05-09",
+          "0.99": "2025-06-22"
+        },
+        "year_month_shares": {
+          "2023-01": 0.02991,
+          "2023-02": 0.027804,
+          "2023-03": 0.02991,
+          "2023-04": 0.032543,
+          "2023-05": 0.03149,
+          "2023-06": 0.028436,
+          "2023-07": 0.030016,
+          "2023-08": 0.030858,
+          "2023-09": 0.028331,
+          "2023-10": 0.031806,
+          "2023-11": 0.053712,
+          "2023-12": 0.05624,
+          "2024-01": 0.033807,
+          "2024-02": 0.029173,
+          "2024-03": 0.030964,
+          "2024-04": 0.028541,
+          "2024-05": 0.027699,
+          "2024-06": 0.029068,
+          "2024-07": 0.027488,
+          "2024-08": 0.031174,
+          "2024-09": 0.027804,
+          "2024-10": 0.035703,
+          "2024-11": 0.050132,
+          "2024-12": 0.053818,
+          "2025-01": 0.032438,
+          "2025-02": 0.02991,
+          "2025-03": 0.030016,
+          "2025-04": 0.032438,
+          "2025-05": 0.028331,
+          "2025-06": 0.028436,
+          "2025-07": 0.002001
+        },
+        "other_year_month_share": 0.0,
+        "day_of_week_shares": {
+          "Mon": 0.142812,
+          "Tue": 0.144918,
+          "Wed": 0.142707,
+          "Thu": 0.145866,
+          "Fri": 0.141548,
+          "Sat": 0.137651,
+          "Sun": 0.144497
+        },
+        "hour_shares": null,
+        "always_midnight": null,
+        "timezone": null
+      },
+      "boolean": null
+    },
+    {
+      "name": "status",
+      "position": 4,
+      "type": "string",
+      "nullable": true,
+      "comment": "Current order status",
+      "tags": {},
+      "is_partition": false,
+      "role": "categorical",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 5,
+      "distinct_ratio": 0.0005,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": {
+        "top_values": [
+          {
+            "value": "delivered",
+            "share": 0.7933
+          },
+          {
+            "value": "shipped",
+            "share": 0.0827
+          },
+          {
+            "value": "returned",
+            "share": 0.0731
+          },
+          {
+            "value": "cancelled",
+            "share": 0.0505
+          }
+        ],
+        "other_share": 0.0004,
+        "labels_not_exported": 1,
+        "length": {
+          "min_clipped": 7.0,
+          "mean": 8.7595,
+          "max_clipped": 9.0
+        }
+      },
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "payment_method",
+      "position": 5,
+      "type": "string",
+      "nullable": true,
+      "comment": "Payment method",
+      "tags": {},
+      "is_partition": false,
+      "role": "categorical",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 4,
+      "distinct_ratio": 0.0004,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": {
+        "top_values": [
+          {
+            "value": "card",
+            "share": 0.6413
+          },
+          {
+            "value": "paypal",
+            "share": 0.2057
+          },
+          {
+            "value": "bank_transfer",
+            "share": 0.1008
+          },
+          {
+            "value": "gift_card",
+            "share": 0.0522
+          }
+        ],
+        "other_share": 0.0,
+        "labels_not_exported": 0,
+        "length": {
+          "min_clipped": 4.0,
+          "mean": 5.5796,
+          "max_clipped": 13.0
+        }
+      },
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "subtotal",
+      "position": 6,
+      "type": "decimal(12,2)",
+      "nullable": true,
+      "comment": "Sum of line amounts in EUR",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 5743,
+      "distinct_ratio": 0.5743,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 35.04,
+        "max_clipped": 2064.61,
+        "mean": 578.821472,
+        "std": 456.52744,
+        "quantiles": {
+          "0.01": 35.04,
+          "0.05": 80.7,
+          "0.1": 124.94,
+          "0.25": 235.74,
+          "0.5": 449.74,
+          "0.75": 824.68,
+          "0.9": 1242.43,
+          "0.95": 1528.56,
+          "0.99": 2064.61
+        },
+        "zero_share": 0.0,
+        "negative_share": 0.0,
+        "is_integer": false,
+        "decimals": 2
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "shipping_fee",
+      "position": 7,
+      "type": "decimal(8,2)",
+      "nullable": true,
+      "comment": "Shipping fee in EUR",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 3,
+      "distinct_ratio": 0.0003,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 0.0,
+        "max_clipped": 9.99,
+        "mean": 0.532407,
+        "std": 2.176319,
+        "quantiles": {
+          "0.01": 0.0,
+          "0.05": 0.0,
+          "0.1": 0.0,
+          "0.25": 0.0,
+          "0.5": 0.0,
+          "0.75": 0.0,
+          "0.9": 0.0,
+          "0.95": 4.99,
+          "0.99": 9.99
+        },
+        "zero_share": 0.9407,
+        "negative_share": 0.0,
+        "is_integer": false,
+        "decimals": 2
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "total",
+      "position": 8,
+      "type": "decimal(12,2)",
+      "nullable": true,
+      "comment": "Amount charged: subtotal plus shipping fee",
+      "tags": {},
+      "is_partition": false,
+      "role": "numeric",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 5981,
+      "distinct_ratio": 0.5981,
+      "suppressed": [],
+      "numeric": {
+        "min_clipped": 40.03,
+        "max_clipped": 2066.48,
+        "mean": 579.366722,
+        "std": 456.516876,
+        "quantiles": {
+          "0.01": 40.03,
+          "0.05": 81.25,
+          "0.1": 124.94,
+          "0.25": 235.74,
+          "0.5": 449.74,
+          "0.75": 825.42,
+          "0.9": 1242.66,
+          "0.95": 1528.85,
+          "0.99": 2066.48
+        },
+        "zero_share": 0.0,
+        "negative_share": 0.0,
+        "is_integer": false,
+        "decimals": 2
+      },
+      "categorical": null,
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "discount_code",
+      "position": 9,
+      "type": "string",
+      "nullable": true,
+      "comment": "Promotion code used, if any",
+      "tags": {},
+      "is_partition": false,
+      "role": "categorical",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.8462,
+      "distinct_approx": 5,
+      "distinct_ratio": 0.003251,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": {
+        "top_values": [
+          {
+            "value": "SUMMER10",
+            "share": 0.39987
+          },
+          {
+            "value": "WELCOME5",
+            "share": 0.306892
+          },
+          {
+            "value": "BLACKFRIDAY",
+            "share": 0.188557
+          },
+          {
+            "value": "VIP20",
+            "share": 0.102731
+          }
+        ],
+        "other_share": 0.001951,
+        "labels_not_exported": 1,
+        "length": {
+          "min_clipped": 5.0,
+          "mean": 8.255527,
+          "max_clipped": 11.0
+        }
+      },
+      "text": null,
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "shipping_address",
+      "position": 10,
+      "type": "string",
+      "nullable": true,
+      "comment": "Delivery address",
+      "tags": {},
+      "is_partition": false,
+      "role": "text",
+      "sensitive": true,
+      "sensitive_reasons": [
+        "name:address"
+      ],
+      "null_rate": 0.0,
+      "distinct_approx": 10000,
+      "distinct_ratio": 1.0,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 20.0,
+          "mean": 25.8066,
+          "max_clipped": 29.0
+        },
+        "patterns": [
+          {
+            "pattern": "99 AAAAAA AAAA, 99999",
+            "share": 0.0633
+          },
+          {
+            "pattern": "99 AAAAA AAA AAAAAAAA, 99999",
+            "share": 0.0628
+          },
+          {
+            "pattern": "99 AAAAAAAAA AAAAAAAA, 99999",
+            "share": 0.0625
+          },
+          {
+            "pattern": "99 AAAAAAA AA AAAAAA, 99999",
+            "share": 0.0617
+          },
+          {
+            "pattern": "999 AAAAAAAAA AAAAAAAA, 99999",
+            "share": 0.0607
+          }
+        ],
+        "other_pattern_share": 0.689,
+        "semantic_type": "address"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "ip_address",
+      "position": 11,
+      "type": "string",
+      "nullable": true,
+      "comment": "IP address of the buyer",
+      "tags": {},
+      "is_partition": false,
+      "role": "text",
+      "sensitive": true,
+      "sensitive_reasons": [
+        "name:ip_address",
+        "name:address",
+        "value_pattern:ip_address"
+      ],
+      "null_rate": 0.0,
+      "distinct_approx": 10000,
+      "distinct_ratio": 1.0,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": null,
+      "text": {
+        "length": {
+          "min_clipped": 11.0,
+          "mean": 13.2982,
+          "max_clipped": 15.0
+        },
+        "patterns": [
+          {
+            "pattern": "999.999.999.999",
+            "share": 0.1307
+          },
+          {
+            "pattern": "99.999.999.999",
+            "share": 0.0938
+          },
+          {
+            "pattern": "999.99.999.999",
+            "share": 0.0783
+          },
+          {
+            "pattern": "999.999.999.99",
+            "share": 0.0782
+          },
+          {
+            "pattern": "999.999.99.999",
+            "share": 0.0733
+          }
+        ],
+        "other_pattern_share": 0.5457,
+        "semantic_type": "ip_address"
+      },
+      "date": null,
+      "boolean": null
+    },
+    {
+      "name": "channel",
+      "position": 12,
+      "type": "string",
+      "nullable": true,
+      "comment": "Sales channel",
+      "tags": {
+        "business": "kpi"
+      },
+      "is_partition": true,
+      "role": "categorical",
+      "sensitive": false,
+      "sensitive_reasons": [],
+      "null_rate": 0.0,
+      "distinct_approx": 4,
+      "distinct_ratio": 0.0004,
+      "suppressed": [],
+      "numeric": null,
+      "categorical": {
+        "top_values": [
+          {
+            "value": "web",
+            "share": 0.5098
+          },
+          {
+            "value": "store",
+            "share": 0.2511
+          },
+          {
+            "value": "app",
+            "share": 0.1918
+          },
+          {
+            "value": "phone",
+            "share": 0.0473
+          }
+        ],
+        "other_share": 0.0,
+        "labels_not_exported": 0,
+        "length": {
+          "min_clipped": 3.0,
+          "mean": 3.5968,
+          "max_clipped": 5.0
+        }
+      },
+      "text": null,
+      "date": null,
+      "boolean": null
+    }
+  ],
+  "rules": [
+    {
+      "kind": "date_order",
+      "before": "order_ts",
+      "after": "ship_date",
+      "match_rate": 0.988836,
+      "suppressed": []
+    },
+    {
+      "kind": "numeric_identity",
+      "target": "total",
+      "operation": "sum",
+      "operands": [
+        "subtotal",
+        "shipping_fee"
+      ],
+      "match_rate": 1.0,
+      "sample_fraction": 1.0,
+      "suppressed": []
+    }
+  ],
+  "warnings": []
+}
