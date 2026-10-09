@@ -23,7 +23,9 @@ synthgen/
     _safe.py              # the only place Spark results are collected
 config/example_dataset.yaml  # every setting spelled out with its default
 schemas/                  # JSON Schema of the profile files, for reviewers
-notebooks/01_profile_pass1.py
+notebooks/01_profile_tables.ipynb  # self-contained customer notebook (generated, do not edit by hand)
+docs/customer_runbook.md     # instructions for the person running it
+scripts/build_notebook.py    # rebuilds the notebook from the package source
 scripts/profile_fixture.py   # run pass 1 on the test fixture locally
 examples/fixture_profiles/   # sample output from the fixture
 tests/
@@ -48,10 +50,14 @@ uv venv --python 3.12 .venv && uv pip install --python .venv/bin/python -e ".[de
 
 ## On Databricks
 
-Build a wheel (`uv build`), upload it to the workspace, write a dataset config based on
-`config/example_dataset.yaml`, then run `notebooks/01_profile_pass1.py`. The code uses only the
-DataFrame API (no RDDs, no `sparkContext`), so it runs on Spark Connect (serverless and shared access
-mode) as well as classic clusters, on Spark 3.5+ (DBR 15.4+).
+Send [`notebooks/01_profile_tables.ipynb`](notebooks/01_profile_tables.ipynb) and the
+[runbook](docs/customer_runbook.md). The notebook embeds the package source, so nothing else is
+uploaded; its first cell installs `pydantic` from PyPI. The person edits one configuration cell and
+clicks Run all. After changing code under `synthgen/`, rebuild it with
+`python scripts/build_notebook.py` (a test fails if it is out of date).
+
+The code uses only the DataFrame API (no RDDs, no `sparkContext`), so it runs on Spark Connect
+(serverless and shared access mode) as well as classic clusters, on Spark 3.5+ (DBR 15.4+).
 
 ## How the hard constraints are enforced in pass 1
 

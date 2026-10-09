@@ -14,29 +14,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from tests.conftest import _ensure_java, load_config  # noqa: E402
+from tests.conftest import load_config  # noqa: E402
+from tests.conftest_spark import local_spark  # noqa: E402
 from tests.fixtures.retail import build_fake_information_schema, build_retail  # noqa: E402
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-    _ensure_java()
-    from pyspark.sql import SparkSession
-
     from synthgen.profiler.pass1 import run_pass1
 
     output_root = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "examples" / "fixture_profiles"
     with tempfile.TemporaryDirectory() as warehouse:
-        spark = (
-            SparkSession.builder.master("local[2]")
-            .config("spark.ui.enabled", "false")
-            .config("spark.sql.shuffle.partitions", "4")
-            .config("spark.sql.catalogImplementation", "in-memory")
-            .config("spark.sql.warehouse.dir", warehouse)
-            .config("spark.sql.session.timeZone", "UTC")
-            .getOrCreate()
-        )
-        spark.sparkContext.setLogLevel("ERROR")
+        spark = local_spark(warehouse)
         build_retail(spark)
         build_fake_information_schema(spark)
         result = run_pass1(spark, load_config(output_root))

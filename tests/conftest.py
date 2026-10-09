@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-import os
-import shutil
-import subprocess
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,41 +7,15 @@ import pytest
 
 from synthgen.config import SynthgenConfig
 from synthgen.profiler.pass1 import Pass1Result, run_pass1
+from tests.conftest_spark import local_spark
 from tests.fixtures.retail import RetailFixture, build_fake_information_schema, build_retail
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
 
-def _ensure_java() -> None:
-    """Local Spark setup: workers use this interpreter; Spark 3.5/4.0 need Java 17 or 21.
-    On macOS, pick a supported JDK automatically if JAVA_HOME is unset."""
-    os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
-    if os.environ.get("JAVA_HOME") or not shutil.which("/usr/libexec/java_home"):
-        return
-    for version in ("21", "17"):
-        found = subprocess.run(["/usr/libexec/java_home", "-v", version], capture_output=True, text=True)
-        if found.returncode == 0:
-            os.environ["JAVA_HOME"] = found.stdout.strip()
-            return
-
-
 @pytest.fixture(scope="session")
 def spark(tmp_path_factory):
-    _ensure_java()
-    from pyspark.sql import SparkSession
-
-    warehouse = tmp_path_factory.mktemp("warehouse")
-    session = (
-        SparkSession.builder.master("local[2]")
-        .appName("synthgen-tests")
-        .config("spark.ui.enabled", "false")
-        .config("spark.sql.shuffle.partitions", "4")
-        .config("spark.sql.catalogImplementation", "in-memory")
-        .config("spark.sql.warehouse.dir", str(warehouse))
-        .config("spark.sql.session.timeZone", "UTC")
-        .getOrCreate()
-    )
-    session.sparkContext.setLogLevel("ERROR")
+    session = local_spark(str(tmp_path_factory.mktemp("warehouse")))
     yield session
     session.stop()
 

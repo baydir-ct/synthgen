@@ -10,7 +10,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 # Hard floor for k. The plan allows configuring k but never below 5.
@@ -186,6 +185,8 @@ class SynthgenConfig(_Section):
 
     @classmethod
     def load(cls, path: str | Path) -> SynthgenConfig:
+        import yaml  # only needed for YAML configs; notebooks configure in Python
+
         with open(path, encoding="utf-8") as fh:
             raw = yaml.safe_load(fh) or {}
         return cls.model_validate(raw)
