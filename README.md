@@ -1,8 +1,15 @@
 # synthgen
 
-Profiles Unity Catalog tables in a customer workspace into privacy-filtered statistics, and (later
-milestones) regenerates statistically similar synthetic tables in another workspace for a Genie demo.
-The full spec is [PLAN.md](PLAN.md).
+Build a realistic **Databricks Genie demo without touching customer data**.
+
+1. In the customer's workspace, a notebook reads their tables and exports **statistics only** (types,
+   null rates, percentiles, frequent categories, links between tables). Personal data, rare values and
+   extremes never leave: they are detected and suppressed in code, and a person reviews the export.
+2. In your own workspace, a second notebook turns those statistics into **fake tables** with the same
+   names, columns, comments and keys, and similar distributions, ready for a Genie space.
+
+Both are single, self-contained notebooks configured in one cell. The design and privacy rules are in
+[PLAN.md](PLAN.md).
 
 **Status:** milestone 1 (profiler) and a first generator (milestone 3, simple version) are done.
 Milestones 2 (automatic privacy guard), 4 (validator) and 5 (question-driven joint statistics) are
@@ -97,3 +104,7 @@ The code uses only the DataFrame API (no RDDs, no `sparkContext`), so it runs on
 | Review before export | Profiles are written only to `<output.root>/review/`. |
 | Read-only source | The profiler only issues `SELECT`-type DataFrame operations; tests snapshot the warehouse and catalog before and after a run. |
 | Last check | `enforce_export_policy` refuses to write a profile where a no-values column carries value statistics. |
+
+## License
+
+[Apache License 2.0](LICENSE).
